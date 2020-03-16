@@ -1,0 +1,7 @@
+grant codeBase "file:/home/ALUNOSFC//home/aluno-di/Desktop/Proj fase1/-"{
+  permission java.io.FilePermission "/home/aluno-di/Desktop/Proj fase1/-","read,write";
+
+  //aceita conneccao de qualquer
+  permission java.net.SocketPermission "localhost:0-", "accept, listen";
+
+}
