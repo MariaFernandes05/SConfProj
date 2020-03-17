@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 //Grupos do Mequie
 
 public class Grupo {
@@ -29,11 +28,9 @@ public class Grupo {
     //Adiciona um utilizador
     //return -1 --- caso deia erro
     public int addUser(String idUser){
-        //Se o utilizador ja existe
-        if(users.contains(idUser)){
-            System.out.print("User ja existe neste grupo");
+      if(users.contains(idUser)){
             return -1;
-        }
+      }
         users.add(idUser);
         return 0;
     }

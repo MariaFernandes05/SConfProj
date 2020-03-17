@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 //Servidor MequieServer
 public class MequieServer {
    //Grupo geral
@@ -95,6 +94,8 @@ public class MequieServer {
                    geral.addUser(dup[0]);
                }
 
+               //Recupera grupos
+               loadGrupos();
                //Repõe o scanner no inicio do ficheiro
                scanFile = new Scanner(file);
 
@@ -167,10 +168,14 @@ public class MequieServer {
                    "[p] photo<groupID> <photo>\n" +
                    "[co] collect<groupID>\n" +
                    "[h] history<groupID>\n");
+                   /*for (Map.Entry<String,Grupo> entry : grupos.entrySet())
+                              System.out.println("Key = " + entry.getKey() +
+                                               ", Value = " + entry.getValue());*/
    }
 
    //Cria um novo grupo
-   public void create(String grupoId, User owner) throws IOException{
+   public void create(String grupoId, User owner) throws IOException,FileNotFoundException{
+     loadGrupos();
        //Grupo ja existe
        if(grupos.containsKey(grupoId)){
            System.out.println("Grupo ja existe");
@@ -206,7 +211,8 @@ public class MequieServer {
    }
 
    //Adiciona utilizador
-   public void addUtilizador(String userId, String grupoId, User user) throws IOException {
+   public void addUtilizador(String userId, String grupoId, User user) throws IOException, FileNotFoundException {
+     loadGrupos();
        //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
@@ -232,7 +238,8 @@ public class MequieServer {
    }
 
    //Remover um utilizador
-   public void remover(String userId, String grupoId, User user) throws IOException {
+   public void remover(String userId, String grupoId, User user) throws IOException, FileNotFoundException {
+     loadGrupos();
      //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
@@ -258,7 +265,8 @@ public class MequieServer {
    }
 
    //Informacao sobre um grupo
-   public void ginfo(String grupoId, User user){
+   public void ginfo(String grupoId, User user) throws FileNotFoundException{
+     loadGrupos();
        //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
@@ -269,14 +277,15 @@ public class MequieServer {
        //Imprime informacoes
        System.out.println("Dono: " + gp.getOwner().getNome());
        System.out.println("Numero de utilizadores: " + gp.getUsers().size());
-       System.out.print("Utilizadores: ");
        if(gp.getOwner().getNome().equals(user.getNome())){
+           System.out.print("Utilizadores: ");
            System.out.println(gp.getUsers());
        }
    }
 
    //informacoes sobre o utilizador
-   public void uinfo(User user){
+   public void uinfo(User user) throws FileNotFoundException{
+     loadGrupos();
        //Grupos de que o user e owner
        List<String> gruposOwner = new ArrayList<String>();
        //Grupos a que o user pertence
@@ -296,7 +305,8 @@ public class MequieServer {
        System.out.println("O utilizador pertence aos grupos: " + gruposPertence.toString());
    }
 
-   public void msg(String grupoId, String mensagem, User user){
+   public void msg(String grupoId, String mensagem, User user) throws FileNotFoundException{
+     loadGrupos();
      //Grupo nao existe
      if(!grupos.containsKey(grupoId)){
          System.out.println("Grupo nao existe");
@@ -342,5 +352,46 @@ public class MequieServer {
      tmp.renameTo(old);
      write.close();
      sc.close();
+   }
+
+   /*
+    * vai reler tudo de cada grupo
+    *Ainda so recuperamos o dono e os utilizadores
+    *
+    *TODO: a parte das imagens e mensagens
+    */
+   private void loadGrupos() throws FileNotFoundException {
+     //Scanner para o ficheiro grupos.txt
+     Scanner gruposFile = new Scanner(new File("grupos.txt"));
+     //Linha corrente do ficheiro grupos.txt
+     String current;
+     //Enquanto ha grupos
+     while(gruposFile.hasNextLine()){
+       current = gruposFile.nextLine();
+       //Scanner para o ficheiro owner.txt do grupo atual
+       Scanner ownerFile = new Scanner(new File(current+"/owner.txt"));
+       String tmpOwner = ownerFile.nextLine();
+       //Criacao do owner
+       User owner = new User(tmpOwner);
+       //Criacao do grupo
+       Grupo novo = new Grupo(current,owner);
+       //Adicionar grupo ao mapa
+       this.grupos.put(current,novo);
+       //Scanner para o ficheiro utilizadores.txt do grupo atual
+       Scanner utilizadoresFile = new Scanner(new File(current+"/utilizadores.txt"));
+       //Utilizador atual
+       String currentUt;
+       //Enquanto ha utilizadores
+       while(utilizadoresFile.hasNextLine()){
+         currentUt = utilizadoresFile.nextLine();
+         //Ir buscar grupos NAO SEI SE E NECESSARIO OU SE BASTA USAR O GRUPO  novo DEFINIDO EM CIMA
+         Grupo gp = grupos.get(current);
+         //Adicionar utilizador
+         gp.addUser(currentUt);
+       }
+       ownerFile.close();
+       utilizadoresFile.close();
+     }
+     gruposFile.close();
    }
 }
