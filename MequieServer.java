@@ -188,13 +188,16 @@ public class MequieServer {
        grupos.put(grupoId,novo);
        //Cria uma pasta que vai conter as informacoes do grupo
        new File(grupoId).mkdir();
-       //Cria ficherio que guarda mensagens
-       createFiles(grupoId +"//mensagens.txt");
-       //Cria ficherio que guarda owner
+       //Cria uma pasta para mensagens
+       new File(grupoId +"//mensagens").mkdir();
+       //createFiles(grupoId +"//mensagens.txt");
+       //Cria uma pasta para fotos
+       new File(grupoId +"//fotos").mkdir();
+       //Cria ficheiro que guarda owner
        createFiles(grupoId +"//owner.txt");
        //Escreve owner no ficheiro
        writeStringFile(owner.getNome(),grupoId+"//owner.txt");
-       //Cria ficherio que guarda utilizadores
+       //Cria ficheiro que guarda utilizadores
        createFiles(grupoId +"//utilizadores.txt");
        //Escreve o owner no ficheiro, pois o mesmo e um utilizador
        writeStringFile(owner.getNome(),grupoId+"//utilizadores.txt");
@@ -256,7 +259,7 @@ public class MequieServer {
 
    //Informacao sobre um grupo
    public void ginfo(String grupoId, User user){
-       //GRupo nao existe
+       //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
            System.exit(0);
@@ -291,6 +294,21 @@ public class MequieServer {
        }
        System.out.println("O utilizador e dono dos grupos: " + gruposOwner.toString());
        System.out.println("O utilizador pertence aos grupos: " + gruposPertence.toString());
+   }
+
+   public void msg(String grupoId, String mensagem, User user){
+     //Grupo nao existe
+     if(!grupos.containsKey(grupoId)){
+         System.out.println("Grupo nao existe");
+         System.exit(0);
+     }
+     //Vai buscar o grupo
+      Grupo gp = grupos.get(grupoId);
+     //Utilizador nao pertence ao grupo
+     if(!gp.containsUser(user.getNome())){
+         System.out.println("Utilizador nao pertence ao grupo");
+         System.exit(0);
+     }
    }
 
    //Cria ficheiros
