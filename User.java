@@ -8,12 +8,9 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
-
 //User do Mequie
 
 public class User {
-    //public List<Grupo> gOwn;
-    //public List<Grupo> gPert;
     public String nome = "";
     public String password = "";
 
@@ -21,10 +18,12 @@ public class User {
     public User(String nome,String password){
         this.nome = nome;
         this.password = password;
-        //this.gOwn = new ArrayList<Grupo>();
-        //this.gPert = new ArrayList<Grupo>();
     }
 
+    //Construtor so com nome
+    public User(String nome){
+      this.nome = nome;
+    }
     //Retorna o nome do user
     public String getNome(){
         return this.nome;
@@ -34,24 +33,4 @@ public class User {
     public String getPassword(){
         return this.password;
     }
-/*
-    public Grupo[] getGruposOwner(){
-        return this.gOwn;
-    }
-
-    public Grupo[] getGruposPertence(){
-        return this.gPert;
-    }
-
-    public void addGO(Grupo grupo){
-        this.gOwn.add(grupo);
-    }
-
-    public void addGP(Grupo grupo){
-        this.gPert.add(grupo);
-    }
-
-    public void remove(Grupo grupo){
-        this.gPert.remove(grupo);
-    }*/
 }
