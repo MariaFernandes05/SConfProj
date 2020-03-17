@@ -52,7 +52,6 @@ public class MequieServer {
        private Socket socket = null;
        ServerThread(Socket inSoc) {
            socket = inSoc;
-           System.out.println("thread do server para cada cliente");
        }
        public void run(){
            try {
@@ -69,7 +68,6 @@ public class MequieServer {
                    //Lê do cliente
                    nomeUser = (String)inStream.readObject();
                    passwd = (String)inStream.readObject();
-                   System.out.println("thread: depois de receber a password e o user");
                }catch (ClassNotFoundException e1) {
                    e1.printStackTrace();
                }
@@ -93,8 +91,6 @@ public class MequieServer {
                    stringFile = scanFile.nextLine();
                    aux=stringFile;
                    dup = aux.split(":");
-                   //Cria um novo utilizador
-                   //User user = new User(dup[0],dup[1]);
                    //Regista o utilizador no geral
                    geral.addUser(dup[0]);
                }
@@ -197,21 +193,17 @@ public class MequieServer {
        //Cria ficherio que guarda owner
        createFiles(grupoId +"//owner.txt");
        //Escreve owner no ficheiro
-       write = new BufferedWriter(new FileWriter(grupoId+"//owner.txt", true));
-       write.append(owner.getNome() +"\n");
-       write .close();
+       writeStringFile(owner.getNome(),grupoId+"//owner.txt");
        //Cria ficherio que guarda utilizadores
        createFiles(grupoId +"//utilizadores.txt");
        //Escreve o owner no ficheiro, pois o mesmo e um utilizador
-       write = new BufferedWriter(new FileWriter(grupoId+"//utilizadores.txt", true));
-       write.append(owner.getNome() +"\n");
-       write.close();
+       writeStringFile(owner.getNome(),grupoId+"//utilizadores.txt");
 
        System.out.println(owner.getNome() + " criou um grupo: " + grupoId);
    }
 
    //Adiciona utilizador
-   public void addUtilizador(String userId, String grupoId, User user){
+   public void addUtilizador(String userId, String grupoId, User user) throws IOException {
        //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
@@ -230,12 +222,14 @@ public class MequieServer {
            System.exit(0);
        }
 
+       //Escrever na pasta do grupo
+       writeStringFile(userId, grupoId + "//utilizadores.txt");
        System.out.println("Utilizador " + userId + " foi adicionado ao grupo");
        System.out.println(gp.getUsers());
    }
 
    //Remover um utilizador
-   public void remover(String userId, String grupoId, User user){
+   public void remover(String userId, String grupoId, User user) throws IOException {
      //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
@@ -255,6 +249,8 @@ public class MequieServer {
        }
        //Remove utilizador
        gp.remove(userId);
+       //Remover utilizador da pasta
+       removeUserFile(userId,grupoId+"//utilizadores.txt");
        System.out.println(gp.getUsers());
    }
 
@@ -301,5 +297,32 @@ public class MequieServer {
    private void createFiles(String nameFile) throws IOException {
      File novo = new File(nameFile);
      novo.createNewFile();
+   }
+
+   //Escreve String num ficheiros
+   private void writeStringFile(String frase, String file) throws IOException {
+     Writer write = new BufferedWriter(new FileWriter(file, true));
+     write.append(frase +"\n");
+     write .close();
+   }
+
+   //Remove linha de um ficheiro
+   private void removeUserFile(String rem, String nameFile) throws IOException {
+     File old = new File(nameFile);
+     Scanner sc = new Scanner(old);
+     File tmp = new File("tmp.txt");
+     tmp.createNewFile();
+     Writer write = new BufferedWriter(new FileWriter(tmp, true));
+     String current;
+     while(sc.hasNextLine()){
+       current = sc.nextLine();
+       if(current.equals(rem)){
+          continue;
+       }
+       write.append(current);
+     }
+     tmp.renameTo(old);
+     write.close();
+     sc.close();
    }
 }
