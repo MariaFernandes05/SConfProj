@@ -9,6 +9,8 @@ CLASSES = \
 	Mequie.java \
 	User.java \
 	Grupo.java \
+	Mensagem.java \
+	Photo.java \
 
 default: classes
 

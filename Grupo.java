@@ -10,11 +10,17 @@ public class Grupo {
     public User owner;
     //Lista de utilizadores do grupo
     public List<String> users;
+    //Lista de mensagens do grupo
+    public List<Mensagem> msgs;
+    //Lista de fotos do grupo
+    public List<Photo> fotos; 
 
     //Construtor so com o id do grupo
     public Grupo(String id){
         this.id = id;
         users = new ArrayList<String>();
+        msgs  = new ArrayList<Mensagem>();
+        fotos = new ArrayList<Photo>();
     }
 
     //Construtor com o id e o dono do grupo
@@ -22,6 +28,8 @@ public class Grupo {
         this.id = id;
         this.owner = owner;
         users = new ArrayList<String>();
+        msgs  = new ArrayList<Mensagem>();
+        fotos = new ArrayList<Photo>();
         users.add(owner.getNome());
     }
 
@@ -63,5 +71,15 @@ public class Grupo {
     //Remove um utilizador do grupo
     public void remove(String userId){
         this.users.remove(userId);
+    }
+
+    //Adiciona uma mensagem
+    public void addMsg(Mensagem msg){
+        this.msgs.add(msg);
+    }
+
+    //Adiciona uma foto
+    public void addFoto(Photo foto){
+        this.fotos.add(foto);
     }
 }

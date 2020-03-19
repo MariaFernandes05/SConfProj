@@ -168,9 +168,6 @@ public class MequieServer {
                    "[p] photo<groupID> <photo>\n" +
                    "[co] collect<groupID>\n" +
                    "[h] history<groupID>\n");
-                   /*for (Map.Entry<String,Grupo> entry : grupos.entrySet())
-                              System.out.println("Key = " + entry.getKey() +
-                                               ", Value = " + entry.getValue());*/
    }
 
    //Cria um novo grupo
@@ -193,9 +190,9 @@ public class MequieServer {
        grupos.put(grupoId,novo);
        //Cria uma pasta que vai conter as informacoes do grupo
        new File(grupoId).mkdir();
-       //Cria uma pasta para mensagens
-       new File(grupoId +"//mensagens").mkdir();
-       //createFiles(grupoId +"//mensagens.txt");
+       //new File(grupoId +"//mensagens").mkdir();
+       //Cria um ficheiro para mensagens
+       createFiles(grupoId +"//mensagens.txt");
        //Cria uma pasta para fotos
        new File(grupoId +"//fotos").mkdir();
        //Cria ficheiro que guarda owner
@@ -305,7 +302,7 @@ public class MequieServer {
        System.out.println("O utilizador pertence aos grupos: " + gruposPertence.toString());
    }
 
-   public void msg(String grupoId, String mensagem, User user) throws FileNotFoundException{
+   public void msg(String grupoId, String mensagem, User user) throws FileNotFoundException, IOException{
      loadGrupos();
      //Grupo nao existe
      if(!grupos.containsKey(grupoId)){
@@ -319,7 +316,36 @@ public class MequieServer {
          System.out.println("Utilizador nao pertence ao grupo");
          System.exit(0);
      }
+     //Cria mensagem
+     Mensagem msg = new Mensagem(mensagem, user.getNome());
+     //Adiciona mensagem ao grupo
+     gp.addMsg(msg);
+     //Escreve no ficheiro de mensagens do grupo a mensagem
+     writeStringFile(mensagem+"\n",grupoId+"/mensagens.txt");
    }
+   
+   public void photo(String grupoId, String fotoName, User user) throws FileNotFoundException{
+    loadGrupos();
+     //Grupo nao existe
+     if(!grupos.containsKey(grupoId)){
+         System.out.println("Grupo nao existe");
+         System.exit(0);
+     }
+     //Vai buscar o grupo
+      Grupo gp = grupos.get(grupoId);
+     //Utilizador nao pertence ao grupo
+     if(!gp.containsUser(user.getNome())){
+         System.out.println("Utilizador nao pertence ao grupo");
+         System.exit(0);
+     }
+     //SERA QUE E SO ASSIM?
+     //Cria foto
+     Photo foto = new Photo(fotoName,user.getNome());
+     //Adiciona foto ao grupo
+     gp.addFoto(foto);
+   }
+   
+   
 
    //Cria ficheiros
    private void createFiles(String nameFile) throws IOException {

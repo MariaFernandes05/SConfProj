@@ -1,13 +1,6 @@
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 //Cliente Mequie
 public class Mequie {
@@ -40,7 +33,7 @@ public class Mequie {
         //Senão pedesse ao cliente para escrever a password
         }else{
             System.out.println("Introduza password:");
-            password = sc.nextLine();       
+            password = sc.nextLine();
         }
 
 		//Utilizador corrente
@@ -54,7 +47,7 @@ public class Mequie {
         if(in.readObject().equals("close"))
             System.exit(0);
 
-		
+
 
 		Boolean quit = false;
 		//Enquanto o cliente quiser fazer operacoes
@@ -70,30 +63,41 @@ public class Mequie {
 			}else if(parsela[0].equals("a")){
 				server.addUtilizador(parsela[1],parsela[2],user);
 			}else if(parsela[0].equals("r")){
-				server.remover(parsela[1],parsela[2],user);			
+				server.remover(parsela[1],parsela[2],user);
 			}else if(parsela[0].equals("g")){
+				System.out.println(parsela[1]);
 				server.ginfo(parsela[1],user);
 			}else if(parsela[0].equals("u")){
 				server.uinfo(user);
 			}else if(parsela[0].equals("m")){
-				
-			}else if(parsela[0].equals("p")){
-				
-			}else if(parsela[0].equals("co")){
-				
-			}else if(parsela[0].equals("h")){
-				
-			}else{
+				//COMANDO SERVE?
+				server.msg(parsela[1], aux(parsela), user);
+			} else if (parsela[0].equals("p")) {
+				server.photo(parsela[1], parsela[2], user);
+			} else if (parsela[0].equals("co")) {
+
+			} else if (parsela[0].equals("h")) {
+
+			} else {
 				System.out.println("Não existe este comando");
-				quit= true;
+				quit = true;
 			}
 		}
-		//Fechar streams
+		// Fechar streams
 		out.close();
 		in.close();
 		sc.close();
-		
-		//Fechar socket
+
+		// Fechar socket
 		echoSocket.close();
 	}
+	//junta todas as parselas apos o comendo e o id do grupo, com um espaco entre elas. 
+	//Retira o ultimo espaco quando retorna
+	private static String aux(String[] frase) {
+		StringBuilder sb= new StringBuilder();
+		for(int i =2; i< frase.length; i++)
+			sb.append(frase[i]+ " ");
+		return sb.toString().substring(0, sb.length() - 1);
+	}
+	
 }
