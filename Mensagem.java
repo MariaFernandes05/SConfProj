@@ -30,4 +30,8 @@ public class Mensagem {
     public boolean userViu(String userName){
         return vistoPor.contains(userName);
     }
+
+    public String getStringMsg(){
+        return this.msg;
+    }
 }

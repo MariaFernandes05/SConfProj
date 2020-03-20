@@ -66,19 +66,17 @@ public class Mequie {
 			}else if(parsela[0].equals("r")){
 				server.remover(parsela[1],parsela[2],user);
 			}else if(parsela[0].equals("g")){
-				System.out.println(parsela[1]);
 				server.ginfo(parsela[1],user);
 			}else if(parsela[0].equals("u")){
 				server.uinfo(user);
 			}else if(parsela[0].equals("m")){
-				//COMANDO SERVE?
 				server.msg(parsela[1], aux(parsela), user);
 			} else if (parsela[0].equals("p")) {
 				server.photo(parsela[1], parsela[2], user);
 			} else if (parsela[0].equals("co")) {
-
+				server.collect(parsela[1], user);
 			} else if (parsela[0].equals("h")) {
-
+				server.history(parsela[1], user);
 			} else {
 				System.out.println("Não existe este comando");
 				quit = true;

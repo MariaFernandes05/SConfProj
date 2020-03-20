@@ -190,8 +190,10 @@ public class MequieServer {
        //Cria uma pasta que vai conter as informacoes do grupo
        new File(grupoId).mkdir();
        //new File(grupoId +"//mensagens").mkdir();
-       //Cria um ficheiro para mensagens
+       //Cria um ficheiro para mensagens não vistas por todos
        createFiles(grupoId +"//mensagens.txt");
+       //Cria um ficheiro com as mensagens vistas por todos
+       createFiles(grupoId + "//historico.txt");
        //Cria uma pasta para fotos
        new File(grupoId +"//fotos").mkdir();
        //Cria ficheiro que guarda owner
@@ -257,20 +259,24 @@ public class MequieServer {
        gp.remove(userId);
        //Remover utilizador da pasta
        removeUserFile(userId,grupoId+"//utilizadores.txt");
+       System.out.println("Utilizador " + userId + " foi removido do grupo");
        System.out.println(gp.getUsers());
    }
 
    //Informacao sobre um grupo
    public void ginfo(String grupoId, User user) throws FileNotFoundException{
      loadGrupos();
+
        //Grupo nao existe
        if(!grupos.containsKey(grupoId)){
            System.out.println("Grupo nao existe");
            System.exit(0);
        }
+
        //Vai buscar o grupo
        Grupo gp = grupos.get(grupoId);
        //Imprime informacoes
+       System.out.println("Nome do grupo: "+ grupoId);
        System.out.println("Dono: " + gp.getOwner().getNome());
        System.out.println("Numero de utilizadores: " + gp.getUsers().size());
        if(gp.getOwner().getNome().equals(user.getNome())){
@@ -320,7 +326,8 @@ public class MequieServer {
      //Adiciona mensagem ao grupo
      gp.addMsg(msg);
      //Escreve no ficheiro de mensagens do grupo a mensagem
-     writeStringFile(mensagem+"\n",grupoId+"/mensagens.txt");
+     writeStringFile(mensagem,grupoId+"/mensagens.txt");
+     System.out.println("Mensagem foi enviada");
    }
    
    public void photo(String grupoId, String fotoName, User user) throws FileNotFoundException{
@@ -344,6 +351,47 @@ public class MequieServer {
      gp.addFoto(foto);
    }
    
+
+    public void collect(String grupoId, User user) throws IOException, FileNotFoundException{
+        loadGrupos();
+        Grupo gp = grupos.get(grupoId);
+        List<Mensagem> msgs = gp.msgNaoVistasPor(user);
+        for(Mensagem msg : msgs){
+            System.out.println(msg.getStringMsg());
+            msg.addVisto(user.getNome());
+
+            if(gp.vistoPorTodos(msg)){
+                writeStringFile(msg.getStringMsg(), grupoId + "/historico.txt" );
+                gp.removeMsg(msg);
+                removeUserFile(msg.getStringMsg(), grupoId + "/mensagens.txt");
+            }
+        }
+    }
+
+   public void history(String grupoId, User user) throws FileNotFoundException{
+    loadGrupos();
+     //Grupo nao existe
+     if(!grupos.containsKey(grupoId)){
+         System.out.println("Grupo nao existe");
+         System.exit(0);
+     }
+     //Vai buscar o grupo
+      Grupo gp = grupos.get(grupoId);
+     //Utilizador nao pertence ao grupo
+     if(!gp.containsUser(user.getNome())){
+         System.out.println("Utilizador nao pertence ao grupo");
+         System.exit(0);
+     }
+     Scanner historicoFile = new Scanner(new File(grupoId + "/historico.txt"));
+     //Linha corrente do ficheiro historico.txt
+     String current;
+     //Enquanto ha grupos
+     while(historicoFile.hasNextLine()){
+       current = historicoFile.nextLine();
+       System.out.println(current);
+     }
+     
+   }
    
 
    //Cria ficheiros
@@ -414,9 +462,24 @@ public class MequieServer {
          //Adicionar utilizador
          gp.addUser(currentUt);
        }
+       loadMensagens(novo);
        ownerFile.close();
        utilizadoresFile.close();
      }
      gruposFile.close();
    }
+
+   private void loadMensagens(Grupo grupo) throws FileNotFoundException {
+
+    Scanner scM = new Scanner(new File(grupo.id + "/mensagens.txt"));
+    String current;
+
+    while(scM.hasNextLine()){
+        current = scM.nextLine();
+        Mensagem msg = new Mensagem(current);
+        grupo.addMsg(msg);
+    }
+    scM.close();
+   }
+   
 }

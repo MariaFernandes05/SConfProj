@@ -82,4 +82,34 @@ public class Grupo {
     public void addFoto(Photo foto){
         this.fotos.add(foto);
     }
+
+    public List<Mensagem> msgVistasPor(User user){
+        List<Mensagem> vistas = new ArrayList<>();
+        for(Mensagem msg : this.msgs){
+            if(msg.userViu(user.getNome()))
+                vistas.add(msg);
+        }
+        return vistas;
+    }
+
+    public List<Mensagem> msgNaoVistasPor(User user){
+        List<Mensagem> naoVistas = new ArrayList<>();
+        for(Mensagem msg : this.msgs){
+            if(!msg.userViu(user.getNome()))
+                naoVistas.add(msg);
+        }
+        return naoVistas;
+    }
+
+    public void removeMsg(Mensagem msg){
+        this.msgs.remove(msg);
+    }
+    
+    public Boolean vistoPorTodos(Mensagem msg){
+        boolean visto = true;
+        for(String user: this.users)
+            if(!msg.userViu(user))
+                visto = false;
+        return visto;
+    }
 }
