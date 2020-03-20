@@ -13,10 +13,11 @@ public class Mequie {
         }
 		//Servidor
 		MequieServer server = new MequieServer();
-        //Port do servidor
-        int portServer = Integer.parseInt(args[0]);
+		//Port do servidor
+		String[] serverAddress = args[0].split(":");
+        int portServer = Integer.parseInt(serverAddress[1]);
 		//Socket a conectar
-		Socket echoSocket = new Socket("localhost", portServer);
+		Socket echoSocket = new Socket(serverAddress[0], portServer);
 		//Input
 		ObjectInputStream in = new ObjectInputStream(echoSocket.getInputStream());
 		//Output

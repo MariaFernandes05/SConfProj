@@ -75,7 +75,6 @@ public class MequieServer {
                sb.append(nomeUser);
                sb.append(":");
                sb.append(passwd);
-               System.out.println(sb.toString());
                //Faz scan do file
                Scanner scanFile = new Scanner(file);
                String stringFile;
