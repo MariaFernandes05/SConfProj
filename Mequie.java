@@ -4,8 +4,12 @@ import java.util.*;
 
 //Cliente Mequie
 public class Mequie {
-
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+//Input
+private static ObjectInputStream in;
+//Output
+private static ObjectOutputStream out;
+private static final int PCK_SIZE = 1024;
+	public static void main(String[] args) throws Exception {
         //Não tem os argumentos obrigatorios
         if(args.length < 2){
             System.out.println("Formato de execução: Mequie <serverAddress> <localUserID> [password]" );
@@ -19,9 +23,9 @@ public class Mequie {
 		//Socket a conectar
 		Socket echoSocket = new Socket(serverAddress[0], portServer);
 		//Input
-		ObjectInputStream in = new ObjectInputStream(echoSocket.getInputStream());
+		in = new ObjectInputStream(echoSocket.getInputStream());
 		//Output
-		ObjectOutputStream out = new ObjectOutputStream(echoSocket.getOutputStream());
+		out = new ObjectOutputStream(echoSocket.getOutputStream());
 		//Username
 		String nome = args[1];
         //Password
@@ -72,6 +76,9 @@ public class Mequie {
 			}else if(parsela[0].equals("m")){
 				server.msg(parsela[1], aux(parsela), user);
 			} else if (parsela[0].equals("p")) {
+				File fotoFile = new File(parsela[2]);
+				sendFile(fotoFile);
+				server.receiveFile(parsela[1]);
 				server.photo(parsela[1], parsela[2], user);
 			} else if (parsela[0].equals("co")) {
 				server.collect(parsela[1], user);
@@ -90,13 +97,48 @@ public class Mequie {
 		// Fechar socket
 		echoSocket.close();
 	}
-	//junta todas as parselas apos o comendo e o id do grupo, com um espaco entre elas. 
-	//Retira o ultimo espaco quando retorna
+
+	// junta todas as parselas apos o comendo e o id do grupo, com um espaco entre
+	// elas.
+	// Retira o ultimo espaco quando retorna
 	private static String aux(String[] frase) {
-		StringBuilder sb= new StringBuilder();
-		for(int i =2; i< frase.length; i++)
-			sb.append(frase[i]+ " ");
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < frase.length; i++)
+			sb.append(frase[i] + " ");
 		return sb.toString().substring(0, sb.length() - 1);
+	}
+
+	
+	private static void sendFile(File file) throws Exception {
+		/*
+		long s = file.length();
+		int size = (int) s;
+		
+		byte[] buf = new byte[(int) size];
+		*/
+		// Writes file to buffer
+		/*FileInputStream reader = new FileInputStream(file);
+		reader.read(buf);
+		reader.close();*/
+		
+		// Sends file length
+		//out.writeObject(s);
+		out.writeObject(file);
+		// Cleans channel
+		//out.flush();
+		
+		// Sends file in packages
+		/*
+		int i = 0;
+		int counter = (int) Math.floor(size / PCK_SIZE);
+		int lastPck = size - (size % PCK_SIZE);
+		
+		for (i = 0; i < counter; i++) { 
+			out.write(buf, i*PCK_SIZE, PCK_SIZE);
+			out.flush();
+		}
+		out.write(buf, i*PCK_SIZE, size % PCK_SIZE);
+		*/
 	}
 	
 }

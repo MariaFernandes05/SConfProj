@@ -8,6 +8,12 @@ public class MequieServer {
    //Todos os grupos criados
    private Map<String,Grupo> grupos = new HashMap<String,Grupo>();
 
+   //Output
+   private ObjectOutputStream outStream;
+   //Input
+   private ObjectInputStream inStream;
+   private static final int PCK_SIZE = 1024;
+
    public static void main(String[] args) {
        System.out.println("servidor: main");
        MequieServer server = new MequieServer();
@@ -55,9 +61,9 @@ public class MequieServer {
        public void run(){
            try {
                //Output
-               ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
+               outStream = new ObjectOutputStream(socket.getOutputStream());
                //Input
-               ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
+               inStream = new ObjectInputStream(socket.getInputStream());
                //Credenciais a preencher
                String nomeUser = null;
                String passwd = null;
@@ -110,7 +116,7 @@ public class MequieServer {
                        exists =true;
                        System.out.println("O utilizador foi autenticado");
                        menu();
-                   //caso nao for completamente igual, significa que ou o user ou a password esa mal
+                   //caso nao for completamente igual, significa que ou o user ou a password esta mal
                    //entao vamos verificar se o user ja existe
                    }else if(dup[0].equals(nomeUser) && !dup[1].equals(passwd)){
                        System.out.println("Password incorreta");
@@ -122,8 +128,6 @@ public class MequieServer {
 
                //Se utilizador nao existe
                if(!exists){
-                   //Cria um novo utilizador
-                   //User user = new User(nomeUser,passwd);
                    //Regista o utilizador no geral
                    geral.addUser(nomeUser);
                    //escreve no ficheiro o user:password
@@ -259,6 +263,7 @@ public class MequieServer {
        gp.remove(userId);
        //Remover utilizador da pasta
        removeUserFile(userId,grupoId+"//utilizadores.txt");
+       writeStringFile("", grupoId+"//utilizadores.txt");
        System.out.println("Utilizador " + userId + " foi removido do grupo");
        System.out.println(gp.getUsers());
    }
@@ -299,7 +304,7 @@ public class MequieServer {
                gruposPertence.add(entry.getKey());
            }
            //E owner do grupo
-           if(entry.getValue().getOwner().equals(user)){
+           if(entry.getValue().getOwner().getNome().equals(user.getNome())){
                gruposOwner.add(entry.getKey());
            }
        }
@@ -390,9 +395,7 @@ public class MequieServer {
        current = historicoFile.nextLine();
        System.out.println(current);
      }
-     
    }
-   
 
    //Cria ficheiros
    private void createFiles(String nameFile) throws IOException {
@@ -429,9 +432,9 @@ public class MequieServer {
 
    /*
     * vai reler tudo de cada grupo
-    *Ainda so recuperamos o dono e os utilizadores
+    *Ainda so recuperamos o dono, os utilizadores e mensagens
     *
-    *TODO: a parte das imagens e mensagens
+    *TODO: a parte das imagens
     */
    private void loadGrupos() throws FileNotFoundException {
      //Scanner para o ficheiro grupos.txt
@@ -470,7 +473,6 @@ public class MequieServer {
    }
 
    private void loadMensagens(Grupo grupo) throws FileNotFoundException {
-
     Scanner scM = new Scanner(new File(grupo.id + "/mensagens.txt"));
     String current;
 
@@ -481,5 +483,43 @@ public class MequieServer {
     }
     scM.close();
    }
-   
+
+   public void receiveFile(String grupoId) throws IOException, ClassNotFoundException {
+    //int size = (int)inStream.readObject();
+    //byte[] buf = new byte[size];
+    File file = (File) inStream.readObject();
+    File dest = new File(grupoId +"/fotos");
+    copyFileUsingStream(file, dest);
+    /*
+    int i = 0;
+    int counter = (int) Math.floor(size / PCK_SIZE);
+    
+    // Receives Messages, and concatenates it in buffer
+    for (i = 0; i < counter; i++)
+        inStream.read(buf, i*PCK_SIZE, PCK_SIZE);
+    inStream.read(buf, i*PCK_SIZE, size % PCK_SIZE);
+
+    // Writes received message into file
+    FileOutputStream fileToWrite = new FileOutputStream(file);
+    fileToWrite.write(buf);
+    fileToWrite.close();
+    */
+    }
+
+    private static void copyFileUsingStream(File source, File dest) throws IOException {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } finally {
+            is.close();
+            os.close();
+        }
+    }
 }

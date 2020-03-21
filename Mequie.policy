@@ -1,4 +1,4 @@
-grant codeBase "file:/home/aluno-di/Desktop/Proj fase1/-" {
+grant codeBase "file:${user.home}${/}Proj${/}-" {
   permission java.net.SocketPermission "localhost:0-","connect, resolve";
-  permission java.io.FilePermission "/home/aluno-di/Desktop/Proj fase1/-", "read";
+  permission java.io.FilePermission "${user.home}${/}Proj${/}-", "read";
 }
