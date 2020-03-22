@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
 import java.util.*;
 //Servidor MequieServer
 public class MequieServer {
@@ -12,7 +13,6 @@ public class MequieServer {
    private ObjectOutputStream outStream;
    //Input
    private ObjectInputStream inStream;
-   private static final int PCK_SIZE = 1024;
 
    public static void main(String[] args) {
        System.out.println("servidor: main");
@@ -122,8 +122,10 @@ public class MequieServer {
                        System.out.println("Password incorreta");
                        programa = "close";
                        outStream.writeObject("close");
+                       scanFile.close();
                        System.exit(0);
                    }
+
                }
 
                //Se utilizador nao existe
@@ -138,14 +140,16 @@ public class MequieServer {
                    //O programa precisa de terminar
                    programa = "close";
                    outStream.writeObject("close");
+                   scanFile.close();
                    System.exit(0);
                }
 
                //Fechar o programa
                outStream.writeObject(programa);
-               if(programa.equals("close"))
+               if(programa.equals("close")){
+                   scanFile.close();
                    System.exit(0);
-
+               }
                //Fechar streams
                outStream.close();
                inStream.close();
@@ -351,7 +355,7 @@ public class MequieServer {
      }
      //SERA QUE E SO ASSIM?
      //Cria foto
-     Photo foto = new Photo(fotoName,user.getNome());
+     Photo foto = new Photo(fotoName, user.getNome());
      //Adiciona foto ao grupo
      gp.addFoto(foto);
    }
@@ -361,6 +365,7 @@ public class MequieServer {
         loadGrupos();
         Grupo gp = grupos.get(grupoId);
         List<Mensagem> msgs = gp.msgNaoVistasPor(user);
+        //List<Photo> fotos = gp.fotosNaoVistasPor(user);
         for(Mensagem msg : msgs){
             System.out.println(msg.getStringMsg());
             msg.addVisto(user.getNome());
@@ -371,6 +376,13 @@ public class MequieServer {
                 removeUserFile(msg.getStringMsg(), grupoId + "/mensagens.txt");
             }
         }
+        /*for(Photo foto : fotos){
+            //System.out.println() ???? ou enviar ficheiro de volta ????
+            foto.addVisto(user.getNome());
+            if(gp.photoVistoPorTodos(foto)){
+                gp.removeFoto(foto);
+            }
+        } */
     }
 
    public void history(String grupoId, User user) throws FileNotFoundException{
@@ -396,6 +408,8 @@ public class MequieServer {
        System.out.println(current);
      }
    }
+
+
 
    //Cria ficheiros
    private void createFiles(String nameFile) throws IOException {
@@ -460,7 +474,7 @@ public class MequieServer {
        //Enquanto ha utilizadores
        while(utilizadoresFile.hasNextLine()){
          currentUt = utilizadoresFile.nextLine();
-         //Ir buscar grupos NAO SEI SE E NECESSARIO OU SE BASTA USAR O GRUPO  novo DEFINIDO EM CIMA
+         //Ir buscar grupos 
          Grupo gp = grupos.get(current);
          //Adicionar utilizador
          gp.addUser(currentUt);
@@ -485,41 +499,8 @@ public class MequieServer {
    }
 
    public void receiveFile(String grupoId) throws IOException, ClassNotFoundException {
-    //int size = (int)inStream.readObject();
-    //byte[] buf = new byte[size];
-    File file = (File) inStream.readObject();
     File dest = new File(grupoId +"/fotos");
-    copyFileUsingStream(file, dest);
-    /*
-    int i = 0;
-    int counter = (int) Math.floor(size / PCK_SIZE);
-    
-    // Receives Messages, and concatenates it in buffer
-    for (i = 0; i < counter; i++)
-        inStream.read(buf, i*PCK_SIZE, PCK_SIZE);
-    inStream.read(buf, i*PCK_SIZE, size % PCK_SIZE);
-
-    // Writes received message into file
-    FileOutputStream fileToWrite = new FileOutputStream(file);
-    fileToWrite.write(buf);
-    fileToWrite.close();
-    */
-    }
-
-    private static void copyFileUsingStream(File source, File dest) throws IOException {
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(source);
-            os = new FileOutputStream(dest);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
-            }
-        } finally {
-            is.close();
-            os.close();
-        }
+    byte[] content = (byte[]) inStream.readObject();
+    Files.write(dest.toPath(),content);
     }
 }

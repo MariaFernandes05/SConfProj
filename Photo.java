@@ -1,5 +1,4 @@
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 public class Photo {
@@ -24,6 +23,10 @@ public class Photo {
         return vistoPor.contains(userName);
     }
 
-
+    /*
+    public void addVisto(String userName){
+        vistoPor.add(userName);
+    }
+    */
 
 }

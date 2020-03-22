@@ -1,5 +1,3 @@
-import java.io.*;
-import java.net.*;
 import java.util.*;
 //Grupos do Mequie
 
@@ -18,18 +16,18 @@ public class Grupo {
     //Construtor so com o id do grupo
     public Grupo(String id){
         this.id = id;
-        users = new ArrayList<String>();
-        msgs  = new ArrayList<Mensagem>();
-        fotos = new ArrayList<Photo>();
+        this.users = new ArrayList<String>();
+        this.msgs  = new ArrayList<Mensagem>();
+        this.fotos = new ArrayList<Photo>();
     }
 
     //Construtor com o id e o dono do grupo
     public Grupo(String id,User owner){
         this.id = id;
         this.owner = owner;
-        users = new ArrayList<String>();
-        msgs  = new ArrayList<Mensagem>();
-        fotos = new ArrayList<Photo>();
+        this.users = new ArrayList<String>();
+        this.msgs  = new ArrayList<Mensagem>();
+        this.fotos = new ArrayList<Photo>();
         users.add(owner.getNome());
     }
 
@@ -112,4 +110,19 @@ public class Grupo {
                 visto = false;
         return visto;
     }
+
+    /*public void removeFoto(Photo foto){
+        this.fotos.remove(foto);
+    }
+    
+    
+    public Boolean photoVistoPorTodos(Photo foto){
+        boolean visto = true;
+        for(String user: this.users)
+            if(!foto.userViu(user))
+                visto = false;
+        return visto;
+    }*/
+
+    
 }
