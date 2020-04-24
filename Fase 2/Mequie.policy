@@ -1,0 +1,10 @@
+grant codeBase "file:${user.home}${/}Proj${/}-" {
+  permission java.util.PropertyPermission "javax.net.ssl.trustStore", "read, write"
+  permission java.util.PropertyPermission "javax.net.ssl.trustStorePassword", "read, write"
+  permission java.net.SocketPermission "localhost:0-","connect, resolve";
+  permission java.io.FilePermission "${user.home}${/}Proj${/}-", "read";
+};
+
+grant codeBase "file:${java.home}/lib/ext/*" { 
+permission java.security.AllPermission; 
+};

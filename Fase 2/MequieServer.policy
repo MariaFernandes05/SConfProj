@@ -1,0 +1,11 @@
+grant codeBase "file:${user.home}${/}Proj${/}-"{
+  permission java.io.FilePermission "${user.home}${/}Proj${/}-","read,write";
+
+  //aceita conneccao de qualquer
+  permission java.net.SocketPermission "localhost:0-", "accept, listen";
+
+};
+
+grant codeBase "file:${java.home}/lib/ext/*" { 
+permission java.security.AllPermission; 
+};
